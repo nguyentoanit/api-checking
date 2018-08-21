@@ -1,2 +1,2 @@
-# api-checking
-Check status of a list API
+# API checking
+Check status of API 
