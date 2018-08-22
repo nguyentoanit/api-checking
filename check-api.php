@@ -41,6 +41,7 @@ if (!$apis){
 // Initial Guzzle Client
 $client = new GuzzleHttp\Client(['base_uri' => $apis['base_uri']]);
 
+//Loop the resource
 foreach ($apis['api'] as $api) {
     try {
         $response = $client->request($api['method'], $api['endpoint'],[
