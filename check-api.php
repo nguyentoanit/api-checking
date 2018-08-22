@@ -23,4 +23,17 @@ if (is_dir($threeDayAgo)) {
     rmdir($threeDayAgo);
 }
 
+$chatwork = new GuzzleHttp\Client(['base_uri' => 'https://api.chatwork.com/v2/rooms/']);
+define("roomID", '');
+define("accessToken", '');
+
+function sendMessage($chatwork){
+    $response = $chatwork->request('POST', roomID.'/messages', [
+        'form_params' => ['body' => urlencode('Test message from client!')],
+        'headers' => ['X-ChatWorkToken' => accessToken]
+        ]);
+}
+
+//sendMessage($chatwork);
+
 ?>
