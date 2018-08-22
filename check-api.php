@@ -44,7 +44,7 @@ $client = new GuzzleHttp\Client(['base_uri' => $apis['base_uri']]);
 foreach ($apis['api'] as $api) {
     try {
         $response = $client->request($api['method'], $api['endpoint'],[
-            'form_params' => $api['parameters'],
+            'json' => $api['parameters'],
             'headers' => $apis['headers']
         ]);
         
