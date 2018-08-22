@@ -1,0 +1,24 @@
+{
+    "base_uri": "https://reqres.in/api/",
+    "headers": {
+        
+    },
+    "api": {
+        "0": {
+            "method": "GET",
+            "endpoint": "users",
+            "parameters": {
+                "page": "2"
+            }
+        },
+        "1": {
+            "method": "POST",
+            "endpoint": "users",
+            "parameters": {
+                "name": "morpheus",
+                "job": "leader"
+            }
+        }
+        
+    }
+}
