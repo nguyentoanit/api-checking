@@ -5,10 +5,16 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
 
-//Check and create folder log
+// Check and create folder log
 $today = date("Y-m-d");
 $threeDayAgo = "log";
 
+// Define variable for Chatwork
+$chatwork = new GuzzleHttp\Client(['base_uri' => 'https://api.chatwork.com/v2/rooms/']);
+define("roomID", '');
+define("accessToken", '');
+
+// Check folder log for today
 if (!is_dir($today)) {
     mkdir($today);
     
@@ -17,23 +23,45 @@ if (!is_dir($today)) {
     $threeDayAgo =  date_format($threeDayAgo,"Y-m-d");
 }
 
-//Check and remove old log folder
+// Check and remove old log folder
 if (is_dir($threeDayAgo)) {
     array_map('unlink', glob("$threeDayAgo/*.*"));
     rmdir($threeDayAgo);
 }
 
-$chatwork = new GuzzleHttp\Client(['base_uri' => 'https://api.chatwork.com/v2/rooms/']);
-define("roomID", '');
-define("accessToken", '');
+// Get list API from json file
+$file_content = file_get_contents('api-list.json');
+$apis = json_decode($file_content, true);
 
-function sendMessage($chatwork){
+// Check result of decode json
+if (!$apis){
+    die('json_decode faile!');
+}
+
+// Initial Guzzle Client
+$client = new GuzzleHttp\Client(['base_uri' => $apis['base_uri']]);
+
+foreach ($apis['api'] as $api) {
+    try {
+        $response = $client->request($api['method'], $api['endpoint'],[
+            'form_params' => $api['parameters'],
+            'headers' => $apis['headers']
+        ]);
+        
+        $code = $response->getStatusCode();
+        sendMessage($chatwork, "$api[endpoint]: $code");
+    } catch (RequestException $e) {
+        if ($e->hasResponse()) {
+            echo Psr7\str($e->getResponse());
+        }
+    }
+}
+
+function sendMessage($chatwork, $message){
     $response = $chatwork->request('POST', roomID.'/messages', [
-        'form_params' => ['body' => urlencode('Test message from client!')],
+        'form_params' => ['body' => $message],
         'headers' => ['X-ChatWorkToken' => accessToken]
         ]);
 }
-
-//sendMessage($chatwork);
 
 ?>
