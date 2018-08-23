@@ -41,7 +41,7 @@ if (!$apis){
 // Initial Guzzle Client
 $client = new GuzzleHttp\Client(['base_uri' => $apis['base_uri']]);
 
-//Lo
+//Loop API list
 foreach ($apis['api'] as $api) {
     try {
         $response = $client->request($api['method'], $api['endpoint'],[
@@ -50,7 +50,12 @@ foreach ($apis['api'] as $api) {
         ]);
         
         $code = $response->getStatusCode();
-        sendMessage($chatwork, "$api[endpoint]: $code");
+        //sendMessage($chatwork, "$api[endpoint]: $code");
+        
+        $data['status'] = $code;
+        $data['time'] = time();
+        file_put_contents("$today/$api[endpoint].log", json_encode($data), FILE_APPEND);
+
     } catch (RequestException $e) {
         if ($e->hasResponse()) {
             echo Psr7\str($e->getResponse());
@@ -58,11 +63,19 @@ foreach ($apis['api'] as $api) {
     }
 }
 
+//Sent message to chatwork
 function sendMessage($chatwork, $message){
     $response = $chatwork->request('POST', roomID.'/messages', [
         'form_params' => ['body' => $message],
         'headers' => ['X-ChatWorkToken' => accessToken]
         ]);
+}
+
+//Get last line of file
+function getLastLine($file) {
+    $data = file($file);
+    $line = $data[count($data)-1];
+    return $line;
 }
 
 ?>
