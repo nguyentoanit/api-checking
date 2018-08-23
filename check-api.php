@@ -43,25 +43,32 @@ $client = new GuzzleHttp\Client(['base_uri' => $apis['base_uri']]);
 
 // Loop API list
 foreach ($apis['api'] as $api) {
+    $data['error'] = '';
+    $data['time'] = time();
+    $lastLog = json_decode(getLastLine("$today/$api[endpoint].log"), true);
+
     try {
         $response = $client->request($api['method'], $api['endpoint'],[
             'json' => $api['parameters'],
             'headers' => $apis['headers']
         ]);
-        
-        $code = $response->getStatusCode();
-        //sendMessage($chatwork, "$api[endpoint]: $code");
-        
-        $data['status'] = $code;
-        $data['time'] = time();
-        $data['notification'] = sendMessage($chatwork, "$api[endpoint]: $code");
-        storeLogFile("$today/$api[endpoint].log", $data);
-
+                
     } catch (RequestException $e) {
+        $data['error'] = Psr7\str($e->getRequest());
         if ($e->hasResponse()) {
-            echo Psr7\str($e->getResponse());
+            $data['error'] = Psr7\str($e->getResponse());
         }
     }
+
+    if ( ($data['error'] != '' && $data['time'] - $lastLog['time'] > 600 ) ) {
+        // Send error message to all
+        $message = $data['error'];
+        sendMessage($chatwork, "$api[endpoint]: $message");
+    } elseif ( !($data['error'] xor $lastLog['error']) ) {
+        $message = 'Alive';
+        sendMessage($chatwork, "$api[endpoint]: $message");
+    } 
+    storeLogFile("$today/$api[endpoint].log", $data);
 }
 
 // Sent message to chatwork
@@ -80,7 +87,11 @@ function sendMessage($chatwork, $message){
 function getLastLine($file) {
     $data = file($file);
     $line = $data[count($data)-1];
-    return $line;
+    if(!$line) {
+        return '{"time": 0,"error":""}';
+    } else {
+        return $line;
+    }
 }
 
 // Store log
