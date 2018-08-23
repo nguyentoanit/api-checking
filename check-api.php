@@ -64,10 +64,10 @@ foreach ($apis['api'] as $api) {
         // Send error message to all
         $message = $data['error'];
         sendMessage($chatwork, "$api[endpoint]: $message");
-    } elseif ( !($data['error'] xor $lastLog['error']) ) {
+    } elseif ( !$data['error'] xor !$lastLog['error'] ) {
         $message = 'Alive';
         sendMessage($chatwork, "$api[endpoint]: $message");
-    } 
+    }
     storeLogFile("$today/$api[endpoint].log", $data);
 }
 
