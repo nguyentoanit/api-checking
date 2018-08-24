@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
 require 'vendor/autoload.php';
+require_once 'configs/chatwork.php';
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
@@ -8,11 +10,6 @@ use GuzzleHttp\Exception\RequestException;
 // Check and create folder log
 $today = date("Y-m-d");
 $threeDayAgo = "log";
-
-// Define variable for Chatwork
-$chatwork = new GuzzleHttp\Client(['base_uri' => 'https://api.chatwork.com/v2/rooms/']);
-define("roomID", '');
-define("accessToken", '');
 
 // Check folder log for today
 if (!is_dir($today)) {
