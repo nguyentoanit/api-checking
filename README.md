@@ -10,3 +10,4 @@
 - Install **composer**
 - Run `composer install` command
 - Allow file execute permission and create folder permission
+- Add a cronjob to run script
